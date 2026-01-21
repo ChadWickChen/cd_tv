@@ -87,6 +87,8 @@ function PlayPageClient() {
   useEffect(() => {
     blockAdEnabledRef.current = blockAdEnabled;
   }, [blockAdEnabled]);
+  const audioOnlyEnabledRef = useRef(false);
+  const [audioOnlyEnabled, setAudioOnlyEnabled] = useState(false);
 
   // 视频基本信息
   const [videoTitle, setVideoTitle] = useState(searchParams.get('title') || '');
@@ -136,12 +138,21 @@ function PlayPageClient() {
     videoTitle,
     videoYear,
   ]);
+  const setAudioOnlyMode = (enabled: boolean) => {
+    audioOnlyEnabledRef.current = enabled;
+    setAudioOnlyEnabled(enabled);
+    const video = artPlayerRef.current?.video as HTMLVideoElement | undefined;
+    if (!video) return;
+    video.style.opacity = enabled ? '0' : '';
+    video.style.pointerEvents = enabled ? 'none' : '';
+  };
 
   // 视频播放地址
   const [videoUrl, setVideoUrl] = useState('');
 
   // 总集数
   const totalEpisodes = detail?.episodes?.length || 0;
+  const audioCoverUrl = videoCover ? processImageUrl(videoCover) : '';
 
   // 用于记录是否需要在播放器 ready 后跳转到指定进度
   const resumeTimeRef = useRef<number | null>(null);
@@ -1426,6 +1437,7 @@ function PlayPageClient() {
           },
         ],
       });
+      setAudioOnlyMode(audioOnlyEnabledRef.current);
 
       // 监听播放器事件
       artPlayerRef.current.on('ready', () => {
@@ -1744,7 +1756,7 @@ function PlayPageClient() {
     <PageLayout activePath='/play'>
       <div className='flex flex-col gap-3 py-4 px-5 lg:px-[3rem] 2xl:px-20'>
         {/* 第一行：影片标题 */}
-        <div className='py-1'>
+        <div className='py-1 flex items-center justify-between gap-3'>
           <h1 className='text-xl font-semibold text-gray-900 dark:text-gray-100'>
             {videoTitle || '影片标题'}
             {totalEpisodes > 1 && (
@@ -1753,6 +1765,21 @@ function PlayPageClient() {
               </span>
             )}
           </h1>
+          <button
+            type='button'
+            onClick={() => setAudioOnlyMode(!audioOnlyEnabled)}
+            className={`lg:hidden flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${
+              audioOnlyEnabled
+                ? 'bg-green-500/10 text-green-700 border-green-300/60 dark:text-green-300 dark:border-green-600/60'
+                : 'bg-white/80 text-gray-600 border-gray-200/70 dark:bg-gray-800/80 dark:text-gray-300 dark:border-gray-700/70'
+            }`}
+            title={audioOnlyEnabled ? '切换为视频模式' : '切换为音频模式'}
+          >
+            <span className='text-sm'>
+              {audioOnlyEnabled ? '🎧' : '🎬'}
+            </span>
+            {audioOnlyEnabled ? '音频模式' : '视频模式'}
+          </button>
         </div>
         {/* 第二行：播放器和选集 */}
         <div className='space-y-2'>
@@ -1811,9 +1838,31 @@ function PlayPageClient() {
               }`}
             >
               <div className='relative w-full h-[300px] lg:h-full'>
+                {audioOnlyEnabled && (
+                  <div className='absolute inset-0 z-20 pointer-events-none flex items-center justify-center'>
+                    <div className='relative w-40 h-40 sm:w-48 sm:h-48'>
+                      <div className='absolute inset-0 rounded-full bg-gradient-to-br from-green-400/80 to-emerald-600/80 blur-md'></div>
+                      <div
+                        className='relative w-full h-full rounded-full border border-white/20 shadow-2xl animate-spin'
+                        style={{
+                          backgroundImage: audioCoverUrl
+                            ? `url("${audioCoverUrl}")`
+                            : 'linear-gradient(135deg, #1f2937, #0f172a)',
+                          backgroundSize: 'cover',
+                          backgroundPosition: 'center',
+                          animationDuration: '18s',
+                        }}
+                      >
+                        <div className='absolute inset-[12%] rounded-full border border-white/15 bg-black/20'></div>
+                      </div>
+                    </div>
+                  </div>
+                )}
                 <div
                   ref={artRef}
-                  className='bg-black w-full h-full rounded-xl overflow-hidden shadow-lg'
+                  className={`w-full h-full rounded-xl overflow-hidden shadow-lg ${
+                    audioOnlyEnabled ? 'bg-transparent' : 'bg-black'
+                  }`}
                 ></div>
 
                 {/* 换源加载蒙层 */}
