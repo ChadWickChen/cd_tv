@@ -1768,7 +1768,7 @@ function PlayPageClient() {
           <button
             type='button'
             onClick={() => setAudioOnlyMode(!audioOnlyEnabled)}
-            className={`lg:hidden flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${
+            className={`lg:hidden flex items-center whitespace-nowrap gap-2 px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${
               audioOnlyEnabled
                 ? 'bg-green-500/10 text-green-700 border-green-300/60 dark:text-green-300 dark:border-green-600/60'
                 : 'bg-white/80 text-gray-600 border-gray-200/70 dark:bg-gray-800/80 dark:text-gray-300 dark:border-gray-700/70'
