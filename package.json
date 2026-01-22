@@ -3,11 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "npm run gen:runtime && npm run gen:manifest && next dev -H 0.0.0.0",
-    "build": "npm run gen:runtime && npm run gen:manifest && next build",
+    "dev": "pnpm run gen:runtime && pnpm run gen:manifest && next dev -H 0.0.0.0",
+    "build": "pnpm run gen:runtime && pnpm run gen:manifest && next build",
     "start": "next start",
     "lint": "next lint",
-    "lint:fix": "eslint src --fix && npm run format",
+    "lint:fix": "eslint src --fix && pnpm run format",
     "lint:strict": "eslint --max-warnings=0 src",
     "typecheck": "tsc --noEmit --incremental false",
     "test:watch": "jest --watch",
@@ -19,7 +19,7 @@
     "gen:version": "node scripts/generate-version.js",
     "postbuild": "echo 'Build completed - sitemap generation disabled'",
     "prepare": "husky install",
-    "pages:build": "npm run gen:runtime && npm run gen:manifest && next build && npx @cloudflare/next-on-pages --experimental-minify"
+    "pages:build": "pnpm run gen:runtime && pnpm run gen:manifest && next build && pnpm dlx @cloudflare/next-on-pages --experimental-minify"
   },
   "dependencies": {
     "@cloudflare/next-on-pages": "^1.13.12",
